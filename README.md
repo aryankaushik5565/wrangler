@@ -216,3 +216,40 @@ Cask is a trademark of Cask Data, Inc. All rights reserved.
 
 Apache, Apache HBase, and HBase are trademarks of The Apache Software Foundation. Used with
 permission. No endorsement by The Apache Software Foundation is implied by the use of these marks.
+
+
+
+
+# Wrangler Assignment – Aryan Kaushik
+
+## 📌 Overview
+
+This submission adds a new directive named `aggregate-stats` to the CDAP Wrangler system.  
+It extends the grammar and parsing framework to support units like byte sizes (`MB`, `GB`) and time durations (`ms`, `s`, `m`).  
+The directive computes total size in megabytes and total time in seconds across all rows.
+
+---
+
+## 🛠 Features Implemented
+
+### 1️⃣ New Token Types in Grammar
+
+| Token         | Description                      | Examples         |
+|---------------|----------------------------------|------------------|
+| `BYTE_SIZE`   | Supports `B`, `KB`, `MB`, `GB`   | `"10MB"`, `"2.5GB"` |
+| `TIME_DURATION` | Supports `ms`, `s`, `m`        | `"500ms"`, `"2s"` |
+
+These are defined in `Directives.g4` and handled in `RecipeVisitor.java`.
+
+---
+
+### 2️⃣ New Directive: `aggregate-stats`
+
+Aggregates a size column and a time column and outputs:
+
+- Total size in megabytes (MB)
+- Total time in seconds (s)
+
+#### ✅ Syntax:
+```wrangler
+aggregate-stats :<byteColumn> :<timeColumn> <targetSizeCol> <targetTimeCol>

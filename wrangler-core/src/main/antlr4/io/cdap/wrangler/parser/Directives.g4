@@ -64,6 +64,8 @@ directive
     | stringList
     | numberRanges
     | properties
+    | BYTE_SIZE
+    | TIME_DURATION
   )*?
   ;
 
@@ -128,7 +130,7 @@ propertyList
  ;
 
 property
- : Identifier '=' ( text | number | bool )
+ : Identifier '=' ( text | number | bool | BYTE_SIZE | TIME_DURATION )
  ;
 
 numberRanges
@@ -140,7 +142,7 @@ numberRange
  ;
 
 value
- : String | Number | Column | Bool
+ : String | Number | Column | Bool | BYTE_SIZE | TIME_DURATION
  ;
 
 ecommand
@@ -195,7 +197,6 @@ identifierList
  : Identifier (',' Identifier)*
  ;
 
-
 /*
  * Following are the Lexer Rules used for tokenizing the recipe.
  */
@@ -215,11 +216,11 @@ StartsWith : '=^';
 NotStartsWith : '!^';
 EndsWith : '=$';
 NotEndsWith : '!$';
-PlusEqual : '+=';
-SubEqual : '-=';
-MulEqual : '*=';
-DivEqual : '/=';
-PerEqual : '%=';
+PlusEqual : '+=' ;
+SubEqual : '-=' ;
+MulEqual : '*=' ;
+DivEqual : '/=' ;
+PerEqual : '%=' ;
 AndEqual : '&=';
 OrEqual  : '|=';
 XOREqual : '^=';
@@ -247,7 +248,6 @@ BackSlash: '\\';
 Dollar   : '$';
 Tilde    : '~';
 
-
 Bool
  : 'true'
  | 'false'
@@ -270,8 +270,8 @@ Column
  ;
 
 String
- : '\'' ( EscapeSequence | ~('\'') )* '\''
- | '"'  ( EscapeSequence | ~('"') )* '"'
+ : '\'' ( EscapeSequence | ~('\'')) * '\''
+ | '"'  ( EscapeSequence | ~('"')) * '"'
  ;
 
 EscapeSequence
@@ -293,7 +293,7 @@ UnicodeEscape
    ;
 
 fragment
-   HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
+HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
 
 Comment
  : ('//' ~[\r\n]* | '/*' .*? '*/' | '--' ~[\r\n]* ) -> skip
@@ -311,3 +311,13 @@ fragment Int
 fragment Digit
  : [0-9]
  ;
+
+fragment DIGITS : [0-9]+ ;
+
+// Units
+fragment BYTE_UNIT: ('B' | 'KB' | 'MB' | 'GB' | 'TB');
+fragment TIME_UNIT: ('ms' | 's' | 'sec' | 'seconds' | 'm' | 'min' | 'minutes');
+
+// Full Tokens
+BYTE_SIZE: DIGITS ('.' DIGITS)? BYTE_UNIT;
+TIME_DURATION: DIGITS ('.' DIGITS)? TIME_UNIT;
